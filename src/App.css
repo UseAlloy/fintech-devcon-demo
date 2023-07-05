@@ -28,6 +28,119 @@
   color: #61dafb;
 }
 
+.dashboard-container {
+  padding-top: 3rem;
+  display: flex;
+  /* justify-content: center; */
+  /* align-items: center; */
+  flex-direction: column;
+  width: 100%;
+}
+
+.dashboard-container h1 {
+  display: flex;
+  justify-content: center;
+  align-items: center
+}
+
+/* .dashboard-title {
+  text-align: center;
+} */
+
+.dashboard-table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  text-align: center;
+  width: 80%;
+
+}
+
+.search-bar {
+  display: flex;
+  justify-content: space-evenly;
+  height: 2rem;
+
+  /* text-align: center; */
+  padding-bottom: 2rem;
+  /* margin: 0 auto; */
+  /* text-align: center; */
+  /* padding-left: 5rem; */
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.dashboard-table th {
+  background-color: #f2f2f2;
+}
+
+.dashboard-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  width: 70%;
+  z-index: 9999;
+  background-color: white;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+}
+
+.modal p {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
+}
+
+.modal p b {
+  flex-basis: 50%;
+  text-align: left;
+  justify-content: center;
+  padding-left: 4rem;
+  padding-right: 2rem;
+}
+
+.modal p {
+  display: flex;
+  justify-content: flex-start;
+  margin: 10px;
+}
+
+.modal button {
+  position: relative;
+  bottom: 1rem;
+  right: 1rem;
+
+}
+
+.dashboard-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
