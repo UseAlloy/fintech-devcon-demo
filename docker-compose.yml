@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:4.4.15
+    container_name: mongo
+    hostname: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+    ports:
+      - 27010:27017
+    networks:
+      - fintech-devcon-demo
+    volumes:
+      - ./.repo/data/mongo:/data/db
+  api:
+    image: harlanj/fintech-devcon-demo-api
+    container_name: fintech-devcon-demo-api
+    hostname: fintech-devcon-demo-api
+    command: |
+      npx tsnd --debug --poll --respawn --transpile-only src/server.ts
+    build:
+      context: ./api
+      dockerfile: ./Dockerfile
+    environment:
+      DEMO_ENVIRONMENT: local
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      MONGO_URI: mongodb://mongo:mongo@mongo:27017
+      MONGO_USER: mongo
+      MONGO_PASSWORD: mongo
+    ports:
+      - 8000:8000
+    volumes:
+      - ./api:/usr/src/app
+    networks:
+      - fintech-devcon-demo
+    depends_on:
+      - mongo
+volumes:
+  mongo:
+networks:
+  fintech-devcon-demo:
