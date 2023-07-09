@@ -39,6 +39,24 @@ services:
       - fintech-devcon-demo
     depends_on:
       - mongo
+  frontend:
+    image: harlanj/fintech-devcon-demo-frontend
+    container_name: fintech-devcon-demo-frontend
+    hostname: fintech-devcon-demo-frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    environment:
+      DEMO_ENVIRONMENT: local
+      DEMO_API_HOST: http://api:8000
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/usr/src/app
+    networks:
+      - fintech-devcon-demo
+    depends_on:
+      - api
 volumes:
   mongo:
 networks:
