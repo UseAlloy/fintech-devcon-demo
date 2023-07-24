@@ -26,3 +26,10 @@ export type UserRecord = {
   user_token: string;
   created_at: Date;
 }
+
+export type UserSearchFilters = {
+  name_first?: string[];
+  name_last?: string[];
+  email_address?: string[];
+  user_token?: string[];
+};

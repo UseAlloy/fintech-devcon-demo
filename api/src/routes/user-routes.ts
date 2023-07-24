@@ -30,6 +30,24 @@ const userRoutes: ServerRoute[] = [
     }
   },
   {
+    method: 'POST',
+    path: '/users/search',
+    handler: controller.searchUsers,
+    options: {
+      tags: ['users'],
+      validate: {
+        payload: joi.object({
+          filters: joi.object({
+            name_first: joi.array().items(joi.string()),
+            name_last: joi.array().items(joi.string()),
+            email_address: joi.array().items(joi.string()),
+            user_token: joi.array().items(joi.string())
+          }).required()
+        }).required()
+      }
+    }
+  },
+  {
     method: 'GET',
     path: '/users/{userToken}',
     handler: controller.getUser,

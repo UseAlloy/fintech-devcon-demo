@@ -1,5 +1,5 @@
 import { Users } from '../collections/users';
-import { NewUserPayload, UserRecordCleaned } from '../types/users';
+import { NewUserPayload, UserRecordCleaned, UserSearchFilters } from '../types/users';
 
 const CLEANED_COLUMNS = [
   '-_id',
@@ -20,21 +20,23 @@ const toObject = (record: any) => {
   } as UserRecordCleaned;
 };
 
-export const findUsers = async () => {
-  const columns = [
-    '-_id',
-    'name_first',
-    'name_last',
-    'email_address',
-    'user_token',
-    'created_at'
-  ].join(' ');
+const formatSearchOptions = (filters: UserSearchFilters) => Object.keys(filters)
+  .reduce((acc, filter) => {
+    const entries = filters[filter];
 
-  const records = await Users
-    .find()
-    .select(columns);
+    if (entries.length > 0) {
+      acc[filter] = { $regex: `.*${entries[0]}*.`, $options: 'i' };
+    }
 
-  return records;
+    return acc;
+  }, {});
+
+export const findUsers = async (filters: UserSearchFilters = {}) => {
+  const options = formatSearchOptions(filters);
+
+  return Users
+    .find(options)
+    .select(CLEANED_COLUMNS);
 };
 
 export const findUser = async (userToken: string) => Users

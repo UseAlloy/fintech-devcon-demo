@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { Request as hapiRequest } from '@hapi/hapi';
 
 import { findUser, findUsers, saveNewUser } from '../repositories/users';
-import { NewUserPayload } from '../types/users';
+import { NewUserPayload, UserSearchFilters } from '../types/users';
 import { Logger } from '../lib/logger';
 import { generateUserToken } from '../lib/token-generator';
 
@@ -17,6 +17,10 @@ type CreateUserPayload = {
   email_address: string;
   password: string;
   password_confirm: string;
+};
+
+type SearchUsersPayload = {
+  filters: UserSearchFilters
 };
 
 const isValidPassword = (val1: string, val2: string) => {
@@ -118,5 +122,28 @@ export const getUser = async (request: Request, reply) => {
         detail: 'Failed to get user'
       }]
     }).code(400);
+  }
+};
+
+export const searchUsers = async (request: Request, reply) => {
+  const logger = request.logger;
+  const { filters } = request.payload as SearchUsersPayload;
+
+  try {
+    const users = await findUsers(filters);
+
+    return reply.response(users).code(200);
+  } catch (err) {
+    logger.error({
+      stack: err.stack,
+      message: err.message
+    }, 'Failed to search users');
+
+    return reply.response({
+      errors: [{
+        status: 500,
+        detail: 'Failed to search users'
+      }]
+    }).code(500);
   }
 };
