@@ -29,19 +29,19 @@ const userRoutes: ServerRoute[] = [
       }
     }
   },
-  // {
-  //   method: 'GET',
-  //   path: '/users/${userToken}',
-  //   handler: () => {},
-  //   options: {
-  //     tags: ['users'],
-  //     validate: {
-  //       params: joi.object({
-  //         userToken: joi.string()
-  //       })
-  //     }
-  //   }
-  // }
+  {
+    method: 'GET',
+    path: '/users/{userToken}',
+    handler: controller.getUser,
+    options: {
+      tags: ['users'],
+      validate: {
+        params: joi.object({
+          userToken: joi.string().required()
+        }).required()
+      }
+    }
+  },
 ];
 
 export default userRoutes;

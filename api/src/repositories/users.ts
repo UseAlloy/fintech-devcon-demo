@@ -1,6 +1,15 @@
 import { Users } from '../collections/users';
 import { NewUserPayload, UserRecordCleaned } from '../types/users';
 
+const CLEANED_COLUMNS = [
+  '-_id',
+  'name_first',
+  'name_last',
+  'email_address',
+  'user_token',
+  'created_at'
+].join(' ');
+
 const toObject = (record: any) => {
   return {
     name_first: record.name_first,
@@ -27,6 +36,10 @@ export const findUsers = async () => {
 
   return records;
 };
+
+export const findUser = async (userToken: string) => Users
+  .findOne({ userToken })
+  .select(CLEANED_COLUMNS);
 
 export const saveNewUser = async (payload: NewUserPayload) => {
   const entity = new Users({

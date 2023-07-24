@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 import { Request as hapiRequest } from '@hapi/hapi';
 
-import { findUsers, saveNewUser } from '../repositories/users';
+import { findUser, findUsers, saveNewUser } from '../repositories/users';
 import { NewUserPayload } from '../types/users';
 import { Logger } from '../lib/logger';
 import { generateUserToken } from '../lib/token-generator';
@@ -56,6 +56,7 @@ export const getUsers = async (request: Request, reply) => {
 };
 
 export const createUser = async (request: Request, reply) => {
+  const logger = request.logger;
   const payload = request.payload as CreateUserPayload;
 
   const validPassword = isValidPassword(payload.password, payload.password_confirm);
@@ -84,7 +85,7 @@ export const createUser = async (request: Request, reply) => {
 
     return reply.response(newUser).code(201);
   } catch (err) {
-    console.error({
+    logger.error({
       stack: err.stack,
       message: err.message
     }, 'Failed to create new user');
@@ -95,5 +96,27 @@ export const createUser = async (request: Request, reply) => {
         detail: 'Failed to create new user'
       }]
     }).code(500);
+  }
+};
+
+export const getUser = async (request: Request, reply) => {
+  const { logger, params: { userToken } } = request;
+
+  try {
+    const record = await findUser(userToken);
+
+    return reply.response(record).code(200);
+  } catch (err) {
+    logger.error({
+      stack: err.stack,
+      message: err.message
+    }, 'Failed to get user');
+
+    return reply.response({
+      errors: [{
+        status: 400,
+        detail: 'Failed to get user'
+      }]
+    }).code(400);
   }
 };
