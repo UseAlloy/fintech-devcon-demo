@@ -1,10 +1,30 @@
 import './App.css';
 import React, {
   useState,
+  useEffect,
 } from 'react';
 import { Table, Button, Form } from 'react-bootstrap';
 import SingleEntityModal from './SingleEntity';
 import AddNewEntity from './AddNewEntity';
+// import userRoutes from '../../api/src/routes';
+
+async function ajaxFetchOptions(url = "", method = "", data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: method,
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      // body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+    return response.json(); // parses JSON response into native JavaScript objects
+}
+
 const Dashboard = () => {
   const data = [
     {firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', ssn: '123456789', number: '333-222-3333', dob: '1980-02-03'},
@@ -20,6 +40,7 @@ const Dashboard = () => {
     {firstName: 'Carol', lastName: 'Bobette', email: 'carol.bobette@example.com', ssn: '891232325', number: '525-434-9988', dob: '1988-11-04'},
   ];
   const [showSingleEntityModal, setShowSingleEntityModal] = useState(false);
+  const [records, setRecords] = useState(Array)
   const [selectedEntity, setSelectedEntity] = React.useState({
     firstName: null,
     lastName: null,
@@ -58,7 +79,22 @@ const Dashboard = () => {
   const handleCloseModal = () => {
     setShowSingleEntityModal(false);
   };
-  
+
+  const getRecords = async () => {
+    try {
+      const response = await ajaxFetchOptions('localhost:3000=/users','GET', {})
+      if (response.status === 200) {
+        setRecords(response)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(() => {
+    getRecords();
+  })
+  //write a fetch function that wraps the fetch function
    return (
     <>
     <div className="dashboard-container">
