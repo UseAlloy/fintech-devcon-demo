@@ -23,8 +23,9 @@ const userRoutes: ServerRoute[] = [
           name_first: joi.string().required(),
           name_last: joi.string().required(),
           email_address: joi.string().required(),
-          password: joi.string().required(),
-          password_confirm: joi.string().required()
+          phone_number: joi.string().required(),
+          social_security_number: joi.string().required(),
+          date_of_birth: joi.string().required(),
         }).required()
       }
     }
@@ -38,9 +39,12 @@ const userRoutes: ServerRoute[] = [
       validate: {
         payload: joi.object({
           filters: joi.object({
+            date_of_birth: joi.array().items(joi.string()),
+            email_address: joi.array().items(joi.string()),
             name_first: joi.array().items(joi.string()),
             name_last: joi.array().items(joi.string()),
-            email_address: joi.array().items(joi.string()),
+            phone_number: joi.array().items(joi.string()),
+            social_security_number: joi.array().items(joi.string()),
             user_token: joi.array().items(joi.string())
           }).required()
         }).required()

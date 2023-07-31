@@ -3,6 +3,14 @@ import mongoose, { Schema } from 'mongoose';
 import { UserRecord } from '../types/users';
 
 const UsersCollection = new Schema<UserRecord>({
+  date_of_birth: {
+    type: Schema.Types.String,
+    required: true
+  },
+  email_address: {
+    type: Schema.Types.String,
+    required: true
+  },
   name_first: {
     type: Schema.Types.String,
     required: true
@@ -11,15 +19,11 @@ const UsersCollection = new Schema<UserRecord>({
     type: Schema.Types.String,
     required: true
   },
-  email_address: {
+  phone_number: {
     type: Schema.Types.String,
     required: true
   },
-  salt: {
-    type: Schema.Types.String,
-    required: true
-  },
-  hash: {
+  social_security_number: {
     type: Schema.Types.String,
     required: true
   },
@@ -34,7 +38,7 @@ const UsersCollection = new Schema<UserRecord>({
 });
 
 UsersCollection.index(
-  { name_first: 1, name_last: 1, email_address: 1 },
+  { name_first: 1, name_last: 1, social_security_number: 1 },
   { unique: true }
 );
 

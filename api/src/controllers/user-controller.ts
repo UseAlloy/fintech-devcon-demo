@@ -6,35 +6,23 @@ import { findUser, findUsers, saveNewUser } from '../repositories/users';
 import { NewUserPayload, UserSearchFilters } from '../types/users';
 import { Logger } from '../lib/logger';
 import { generateUserToken } from '../lib/token-generator';
+import { formatDate } from '../lib/helpers';
 
 type Request = hapiRequest & {
   logger: Logger
 }
 
 type CreateUserPayload = {
+  date_of_birth: string;
+  email_address: string;
   name_first: string;
   name_last: string;
-  email_address: string;
-  password: string;
-  password_confirm: string;
+  phone_number: string;
+  social_security_number: string;
 };
 
 type SearchUsersPayload = {
   filters: UserSearchFilters
-};
-
-const isValidPassword = (val1: string, val2: string) => {
-  if (val1.length < 8) return false;
-  if (val1 !== val2) return false;
-
-  return true;
-};
-
-const hashPassword = (val: string) => {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.pbkdf2Sync(val, salt, 1000, 64, 'sha512').toString('hex');
-
-  return [salt, hash];
 };
 
 export const getUsers = async (request: Request, reply) => {
@@ -63,25 +51,15 @@ export const createUser = async (request: Request, reply) => {
   const logger = request.logger;
   const payload = request.payload as CreateUserPayload;
 
-  const validPassword = isValidPassword(payload.password, payload.password_confirm);
-  if (!validPassword) {
-    return reply.response({
-      errors: [{
-        status: 400,
-        detail: 'Failed password validation'
-      }]
-    }).code(400);
-  }
-
   try {
-    const [hash, salt] = hashPassword(payload.password);
     const newUserPayload: NewUserPayload = {
+      date_of_birth: formatDate(payload.date_of_birth),
+      email_address: payload.email_address,
       name_first: payload.name_first,
       name_last: payload.name_last,
-      email_address: payload.email_address,
+      phone_number: payload.phone_number,
+      social_security_number: payload.social_security_number,
       user_token: generateUserToken(),
-      hash,
-      salt,
       created_at: new Date()
     };
 
