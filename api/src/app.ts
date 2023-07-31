@@ -4,6 +4,7 @@ import * as hapiSwagger from 'hapi-swagger';
 import * as vision from '@hapi/vision';
 
 import { Logger } from './lib/logger';
+import { Request } from './types/router';
 import routes from './routes';
 import pkg from '../package.json';
 
@@ -32,8 +33,40 @@ export class App {
 
     await server.register(plugins);
 
-    server.ext('onRequest', (request: any, reply) => {
-      request.logger = this.logger;
+    server.ext('onRequest', (request: Request, reply) => {
+      request.logger = this.logger.child({
+        method: request.method,
+        url: request.path,
+      });
+
+      request.logger.info({
+        request: {
+          body: request.payload,
+          headers: request.headers,
+          method: request.method,
+          url: request.path,
+        }
+      }, 'Hapi API Request');
+
+      return reply.continue;
+    });
+
+    server.ext('onPreHandler', (request: Request, reply) => {
+      request.payload && request.logger.info({
+        request: { body: request.payload }
+      }, 'Hapi API Request Body')
+      return reply.continue;
+    })
+
+    server.ext('onPostResponse', (request: Request, reply) => {
+      request.logger.info({
+        response: {
+          body: request.response.source,
+          headers: request.response.headers,
+          status: request.response.statusCode,
+        }
+      }, 'Hapi API Response');
+
       return reply.continue;
     });
 
