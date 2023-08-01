@@ -8,21 +8,23 @@ import SingleEntityModal from './SingleEntity';
 import AddNewEntity from './AddNewEntity';
 // import userRoutes from '../../api/src/routes';
 
-async function ajaxFetchOptions(url = "", method = "", data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
+
+function ajaxFetchOptions(method: string, data?: object) {
+    const options = {
       method: method,
-      mode: "cors",
-      cache: "no-cache",
-      credentials: "same-origin",
+      mode: 'cors' as RequestMode,
       headers: {
         "Content-Type": "application/json",
       },
-      redirect: "follow",
-      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      // body: JSON.stringify(data), // body data type must match "Content-Type" header
-    });
-    return response.json(); // parses JSON response into native JavaScript objects
+      body: data && JSON.stringify(data), 
+    }
+    return options;
+}
+
+async function ajaxFetch(url: string, method: string, data?: object) {
+  const requestOptions = ajaxFetchOptions(method, data);
+  const response = await fetch(url, requestOptions)
+  return response.json()
 }
 
 const Dashboard = () => {
@@ -82,18 +84,18 @@ const Dashboard = () => {
 
   const getRecords = async () => {
     try {
-      const response = await ajaxFetchOptions('localhost:3000=/users','GET', {})
+      const response = await ajaxFetch('http://api:8000/users','GET')
       if (response.status === 200) {
         setRecords(response)
       }
-    } catch (err) {
-      console.log(err)
+    } catch (error:any) {
+      console.log(error.stack)
     }
   }
 
   useEffect(() => {
     getRecords();
-  })
+  }, [])
   //write a fetch function that wraps the fetch function
    return (
     <>
