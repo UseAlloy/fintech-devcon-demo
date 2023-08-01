@@ -27,6 +27,17 @@ async function ajaxFetch(url: string, method: string, data?: object) {
   return response.json()
 }
 
+type Record = {
+  name_first: string,
+  name_last: string,
+  email_address: string,
+  date_of_birth: string,
+  phone_number: string,
+  social_security_number: string,
+  user_token: string,
+  created_at: string,
+}
+
 const Dashboard = () => {
   const data = [
     {firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', ssn: '123456789', number: '333-222-3333', dob: '1980-02-03'},
@@ -42,7 +53,7 @@ const Dashboard = () => {
     {firstName: 'Carol', lastName: 'Bobette', email: 'carol.bobette@example.com', ssn: '891232325', number: '525-434-9988', dob: '1988-11-04'},
   ];
   const [showSingleEntityModal, setShowSingleEntityModal] = useState(false);
-  const [records, setRecords] = useState(Array)
+  const [records, setRecords] = useState<Record[]>([]);
   const [selectedEntity, setSelectedEntity] = React.useState({
     firstName: null,
     lastName: null,
@@ -59,10 +70,10 @@ const Dashboard = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredData = data.filter((item) =>
-  item.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  item.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  item.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredData = records.filter((item: Record) =>
+  item.name_first.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  item.name_last.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  item.email_address.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const openSingleEntityModal = (item: any) => {
@@ -84,8 +95,8 @@ const Dashboard = () => {
 
   const getRecords = async () => {
     try {
-      const response = await ajaxFetch('http://api:8000/users','GET')
-      if (response.status === 200) {
+      const response = await ajaxFetch('http://localhost:8000/users','GET')
+      if (response) {
         setRecords(response)
       }
     } catch (error:any) {
@@ -121,11 +132,11 @@ const Dashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((item, index) => (
+          {records.map((item, index) => (
             <tr key={index}>
-              <td>{item.firstName}</td>
-              <td>{item.lastName}</td>
-              <td>{item.email}</td>
+              <td>{item.name_first}</td>
+              <td>{item.name_last}</td>
+              <td>{item.email_address}</td>
               <td>
                 <Button variant="primary" onClick={() => openSingleEntityModal(item)}>
                   View
