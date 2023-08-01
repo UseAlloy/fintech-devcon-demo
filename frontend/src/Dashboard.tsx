@@ -55,12 +55,14 @@ const Dashboard = () => {
   const [showSingleEntityModal, setShowSingleEntityModal] = useState(false);
   const [records, setRecords] = useState<Record[]>([]);
   const [selectedEntity, setSelectedEntity] = React.useState({
-    firstName: null,
-    lastName: null,
-    email: null,
-    ssn: null,
-    number: null,
-    dob: null
+    name_first: null,
+    name_last: null,
+    email_address: null,
+    date_of_birth: null,
+    phone_number: null,
+    social_security_number: null,
+    user_token: null,
+    created_at: null,
   });
   const [openAddNew, setOpenAddNew] = React.useState(false)
 
@@ -70,6 +72,7 @@ const Dashboard = () => {
     setSearchTerm(event.target.value);
   };
 
+  // will update this once search is implemented
   const filteredData = records.filter((item: Record) =>
   item.name_first.toLowerCase().includes(searchTerm.toLowerCase()) ||
   item.name_last.toLowerCase().includes(searchTerm.toLowerCase()) ||

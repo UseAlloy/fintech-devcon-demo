@@ -5,12 +5,14 @@ import './App.css'
   openModal: boolean;
   closeModal: () => void;
   entity: {
-    firstName: string | null,
-    lastName: string | null,
-    email: string | null,
-    ssn: string | null,
-    number: string | null,
-    dob: string | null
+    name_first: string | null,
+    name_last: string | null,
+    email_address: string | null,
+    date_of_birth: string | null,
+    phone_number: string | null,
+    social_security_number: string | null,
+    user_token: string | null,
+    created_at: string | null,
   }
 }
  const SingleEntityModal: React.FC<SingleEntityModalProps> = (props) => {
@@ -26,12 +28,12 @@ import './App.css'
     >
         <h3><u>View Single Entity</u></h3>
         <br />
-        <p><b>First Name:</b> {props.entity.firstName}</p>
-        <p><b>Last Name:</b> {props.entity.lastName}</p>
-        <p><b>Email:</b> {props.entity.email}</p>
-        <p><b>Phone Number:</b> {props.entity.number}</p>        
-        <p><b>Social Security Number:</b> {props.entity.ssn}</p>
-        <p><b>Date of Birth:</b> {props.entity.dob}</p>
+        <p><b>First Name:</b> {props.entity.name_first}</p>
+        <p><b>Last Name:</b> {props.entity.name_last}</p>
+        <p><b>Email:</b> {props.entity.email_address}</p>
+        <p><b>Phone Number:</b> {props.entity.phone_number}</p>        
+        <p><b>Social Security Number:</b> {props.entity.social_security_number}</p>
+        <p><b>Date of Birth:</b> {props.entity.date_of_birth}</p>
         <br />
         <br />
         <button onClick={closeModal}>Close</button>
