@@ -38,6 +38,17 @@ type Record = {
   created_at: string,
 }
 
+type Entity = {
+    name_first: string | null,
+    name_last: string | null,
+    email_address: string | null,
+    date_of_birth: string | null,
+    phone_number: string | null,
+    social_security_number: string | null,
+    user_token: string | null,
+    created_at: string | null,
+}
+
 const Dashboard = () => {
   const data = [
     {firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', ssn: '123456789', number: '333-222-3333', dob: '1980-02-03'},
@@ -54,19 +65,13 @@ const Dashboard = () => {
   ];
   const [showSingleEntityModal, setShowSingleEntityModal] = useState(false);
   const [records, setRecords] = useState<Record[]>([]);
-  const [selectedEntity, setSelectedEntity] = React.useState({
-    name_first: null,
-    name_last: null,
-    email_address: null,
-    date_of_birth: null,
-    phone_number: null,
-    social_security_number: null,
-    user_token: null,
-    created_at: null,
-  });
+  const [singleEntity, setSingleEntity] =  useState<Entity>();
   const [openAddNew, setOpenAddNew] = React.useState(false)
-
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    getRecords();
+  }, [])
 
   const handleSearch = (event:any) => {
     setSearchTerm(event.target.value);
@@ -79,10 +84,16 @@ const Dashboard = () => {
   item.email_address.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const openSingleEntityModal = (item: any) => {
-    setSelectedEntity(item)
-    setShowSingleEntityModal(!showSingleEntityModal)
+  const openSingleEntityModal = async (userToken: string) => {
+    //add get request here selectedEntityToken
+    try {
+      getSingleRecord(userToken);
+      setShowSingleEntityModal(!showSingleEntityModal)
+    } catch(error:any) {
+      console.log(error.stack)
+    }
   }
+
 
   const openAddNewModal = () => {
     setOpenAddNew(!openAddNew)
@@ -107,9 +118,17 @@ const Dashboard = () => {
     }
   }
 
-  useEffect(() => {
-    getRecords();
-  }, [])
+  const getSingleRecord = async (userToken:string) => {
+  try {
+    const response = await ajaxFetch(`http://localhost:8000/users/${userToken}`, 'GET')
+    if (response) {
+      setSingleEntity(response)
+    }
+  } catch (error:any) {
+    console.log(error.stack)
+  }
+  }
+
   //write a fetch function that wraps the fetch function
    return (
     <>
@@ -141,7 +160,7 @@ const Dashboard = () => {
               <td>{item.name_last}</td>
               <td>{item.email_address}</td>
               <td>
-                <Button variant="primary" onClick={() => openSingleEntityModal(item)}>
+                <Button variant="primary" onClick={() => openSingleEntityModal(item.user_token)}>
                   View
                 </Button> 
               </td>
@@ -150,28 +169,28 @@ const Dashboard = () => {
         </tbody>
       </Table>
     </div>
-    {showSingleEntityModal && (
+    {showSingleEntityModal && singleEntity && (
       <div>
         <div className="overlay"></div>
-        <div className="modal">
-        <SingleEntityModal 
-      openModal={showSingleEntityModal}
-      closeModal={handleCloseModal}
-      entity={selectedEntity} //need to get a specific row 
-      />
+          <div className="modal">
+          <SingleEntityModal 
+            openModal={showSingleEntityModal}
+            closeModal={handleCloseModal}
+            entity={singleEntity}
+          />
         </div>
       </div>
       
     )}
     {openAddNew && (
       <div>
-        <div className="overlay">
+        <div className="overlay"></div>
           <div className="modal">
             <AddNewEntity addNewModal={openAddNew}
             closeModal={closeAddNewModal}/>
           </div> 
          </div>
-     </div>
+
       
     )}
     </>
