@@ -16,7 +16,8 @@ export class App {
   async startServer() {
     const server = new hapi.Server({
       host: '0.0.0.0',
-      port: process.env.PORT || 8000
+      port: process.env.PORT || 8000,
+      routes: { cors: true }
     });
 
     const swaggerOptions = {
