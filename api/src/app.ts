@@ -62,8 +62,11 @@ export class App {
     server.ext('onPostResponse', (request: Request, reply) => {
       request.logger.info({
         response: {
+          // @ts-ignore 
           body: request.response.source,
+          // @ts-ignore 
           headers: request.response.headers,
+          // @ts-ignore 
           status: request.response.statusCode,
         }
       }, 'Hapi API Response');
