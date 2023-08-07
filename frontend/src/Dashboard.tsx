@@ -186,7 +186,8 @@ const Dashboard = () => {
       <div>
         <div className="overlay"></div>
           <div className="modal">
-            <AddNewEntity addNewModal={openAddNew}
+            <AddNewEntity 
+            addNewModal={openAddNew}
             closeModal={closeAddNewModal}/>
           </div> 
          </div>

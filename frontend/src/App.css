@@ -94,8 +94,17 @@
   flex-direction: column;
   text-align: center;
   width: 70%;
+  height: 40%;
   z-index: 9999;
   background-color: white;
+}
+
+.modal label {
+  margin-right: 10px;
+}
+
+.modal input {
+  margin-bottom: 10px;
 }
 
 .overlay {
@@ -131,7 +140,7 @@
 }
 
 .modal button {
-  position: relative;
+  /* position: relative; */
   bottom: 1rem;
   right: 1rem;
 
