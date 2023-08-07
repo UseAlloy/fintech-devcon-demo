@@ -188,7 +188,9 @@ const Dashboard = () => {
           <div className="modal">
             <AddNewEntity 
             addNewModal={openAddNew}
-            closeModal={closeAddNewModal}/>
+            closeModal={closeAddNewModal}
+            ajaxFetch={ajaxFetch}
+            getRecords={getRecords} />
           </div> 
          </div>
 
