@@ -3,7 +3,7 @@ import React, {
   useState,
   useEffect,
 } from 'react';
-import { Table, Button, Form } from 'react-bootstrap';
+import { Table, Button, Form, Dropdown } from 'react-bootstrap';
 import SingleEntityModal from './SingleEntity';
 import AddNewEntity from './AddNewEntity';
 // import userRoutes from '../../api/src/routes';
@@ -69,20 +69,20 @@ const Dashboard = () => {
   const [openAddNew, setOpenAddNew] = React.useState(false)
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [filter, setFilter] = useState('');
+  const [filteredValue, setFilteredValue] = useState('');
+
   useEffect(() => {
     getRecords();
   }, [])
+  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilter(event.target.value);
+  };
 
-  const handleSearch = (event:any) => {
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  // will update this once search is implemented
-  const filteredData = records.filter((item: Record) =>
-  item.name_first.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  item.name_last.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  item.email_address.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const openSingleEntityModal = async (userToken: string) => {
     //add get request here selectedEntityToken
@@ -93,7 +93,6 @@ const Dashboard = () => {
       console.log(error.stack)
     }
   }
-
 
   const openAddNewModal = () => {
     setOpenAddNew(!openAddNew)
@@ -132,17 +131,36 @@ const Dashboard = () => {
   //write a fetch function that wraps the fetch function
    return (
     <>
-    <div className="dashboard-container">
-      <h1>View All Entities</h1>
-      <div className="search-bar"> 
-        <Form.Control
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={handleSearch}
-      />
-      <Button onClick={() => openAddNewModal()}>Add New Entity</Button>
-      </div>
+      <div className="dashboard-container">
+        <h1>View All Entities</h1>
+        <div className="search-container">
+          <div className="search-bar">
+          <select value={filter} onChange={handleFilterChange}>
+            <option value="" disabled hidden>
+              Select Filter
+            </option>
+            <option value="First Name">First Name</option>
+            <option value="Last Name">Last Name</option>
+            <option value="Date of Birth">DOB</option>
+            <option value="Number">Phone Number</option>
+            <option value="Email">Email Address</option>
+            <option value="SSN">Social Security Number</option>
+          </select>
+          {filter && (
+            <>
+            <button onClick={()=> setFilter('')}>Clear Filter</button>
+              <input
+                type="text"
+                placeholder={`Search by ${filter}`}
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+              <button onClick={() => setFilteredValue(filteredValue)}>Search</button>
+            </>
+          )}
+          </div>
+          <Button onClick={openAddNewModal}>Add New Entity</Button>
+        </div>
       
       <Table striped bordered hover className="dashboard-table">
         <thead>
