@@ -49,6 +49,27 @@ type Entity = {
     created_at: string | null,
 }
 
+// type HumanSearchTerm =
+//   | 'First Name'
+//   | 'Last Name'
+//   | 'Date of Birth'
+//   | 'Number'
+//   | 'Email'
+//   | 'SSN';
+
+// type ProgramSearchTerms = 
+//   | 'name_first'
+//   | 'name_last'
+
+const mappedFilters = {
+  'First Name': 'name_first',
+  'Last Name': 'name_last',
+  'Date of Birth': 'date_of_birth',
+  'Number': 'phone_number',
+  'Email': 'email_address',
+  'SSN': 'social_security_number'
+}
+
 const Dashboard = () => {
   const data = [
     {firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', ssn: '123456789', number: '333-222-3333', dob: '1980-02-03'},
@@ -79,10 +100,6 @@ const Dashboard = () => {
     setFilter(event.target.value);
   };
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
 
   const openSingleEntityModal = async (userToken: string) => {
     //add get request here selectedEntityToken
@@ -106,8 +123,11 @@ const Dashboard = () => {
     setShowSingleEntityModal(false);
   };
 
+  
+
   const getRecords = async () => {
     try {
+
       const response = await ajaxFetch('http://localhost:8000/users','GET')
       if (response) {
         setRecords(response)
@@ -128,7 +148,23 @@ const Dashboard = () => {
   }
   }
 
-  //write a fetch function that wraps the fetch function
+const searchEntities = async (newEntity: Entity) => {
+    try {
+      const thing = mappedFilters[filter];
+      const body = {
+        filters: {
+          mappedFilters[filter]: searchTerm,
+        }
+      };
+      const response = await ajaxFetch('http://localhost:8000/users/search', 'POST', body)
+      if (response) { //unable to get response.status
+
+      }
+    } catch (error:any) {
+      console.log(error.stack)
+    }
+  }
+
    return (
     <>
       <div className="dashboard-container">
@@ -153,7 +189,7 @@ const Dashboard = () => {
                 type="text"
                 placeholder={`Search by ${filter}`}
                 value={searchTerm}
-                onChange={handleSearch}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
               <button onClick={() => setFilteredValue(filteredValue)}>Search</button>
             </>
