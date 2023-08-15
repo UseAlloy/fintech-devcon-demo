@@ -4,9 +4,24 @@ import { Modal } from 'react-bootstrap';
 interface AddNewEntityProps {
     addNewModal: boolean;
     closeModal: () => void;
+    ajaxFetch: (url: string, method: string, data?: object) => Promise<any>;
+    getRecords: () => void;
+}
+
+type Entity = {
+  name_first: string | null,
+  name_last: string | null,
+  email_address: string | null,
+  date_of_birth: string | null,
+  phone_number: string | null,
+  social_security_number: string | null,
 }
  const AddNewEntity: React.FC<AddNewEntityProps> = (props) => {
-  const [firstName, setFirstName] = useState('');
+  const closeModal = () => {
+  props.closeModal()
+ };
+
+ const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [dob, setDob] = useState('');
@@ -14,14 +29,14 @@ interface AddNewEntityProps {
   const [number, setNumber] = useState('');
    const handleSave = () => {
     const newEntity = {
-      firstName,
-      lastName,
-      email,
-      dob,
-      ssn,
-      number,
+      name_first: firstName,
+      name_last: lastName,
+      date_of_birth: dob,
+      email_address: email,
+      phone_number: number,
+      social_security_number: ssn
     };
-    // onAddEntity(newEntity);
+    createNewEntity(newEntity)
     setFirstName('');
     setLastName('');
     setEmail('');
@@ -29,10 +44,26 @@ interface AddNewEntityProps {
     setSsn('');
     setNumber('');
   };
+
+  const createNewEntity = async (newEntity: Entity) => {
+    try {
+      const response = await props.ajaxFetch('http://localhost:8000/users', 'POST', newEntity)
+      if (response) { //unable to get response.status
+        closeModal()
+        props.getRecords()
+      }
+    } catch (error:any) {
+      console.log(error.stack)
+    }
+  }
    return (
-    <Modal>
-        <p>add new</p>
-      {/* <h2>Add New Entity</h2>
+    <Modal
+      show={props.addNewModal}
+      onHide={closeModal}
+      cenetered
+      className='modal'
+    >
+      <h2>Add New Entity</h2>
       <div>
         <label>First Name:</label>
         <input
@@ -40,49 +71,51 @@ interface AddNewEntityProps {
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
         />
-      </div>
-      <div>
+        <br />
         <label>Last Name:</label>
         <input
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
         />
-      </div>
-      <div>
+        <br />
         <label>Email:</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-      </div>
-      <div>
+        <br />
         <label>Date of Birth:</label>
         <input
           type="date"
           value={dob}
           onChange={(e) => setDob(e.target.value)}
         />
-      </div>
-      <div>
+        <br />
         <label>SSN:</label>
         <input
           type="text"
           value={ssn}
           onChange={(e) => setSsn(e.target.value)}
         />
-      </div>
-      <div>
+        <br />
         <label>Number:</label>
         <input
           type="text"
           value={number}
           onChange={(e) => setNumber(e.target.value)}
         />
+        <br />
+        <br />
+        <br />
       </div>
-      <button onClick={handleSave}>Save</button> */}
-    </Modal>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>        
+        <button onClick={closeModal}>Cancel</button>
+        <button onClick={handleSave}>Save</button>
+      </div>
+      
+     </Modal>
   );
 };
  export default AddNewEntity;
