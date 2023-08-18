@@ -7,10 +7,12 @@ import { Logger } from './lib/logger';
 import { Request } from './types/router';
 import routes from './routes';
 import pkg from '../package.json';
+import { EncryptionKeys } from './types/encryption-keys';
 
 export class App {
   constructor(
     private logger: Logger,
+    private encryptionKeys: EncryptionKeys
   ) {}
 
   async startServer() {
@@ -35,6 +37,8 @@ export class App {
     await server.register(plugins);
 
     server.ext('onRequest', (request: Request, reply) => {
+      request.encryptionKeys = this.encryptionKeys;
+
       request.logger = this.logger.child({
         method: request.method,
         url: request.path,
