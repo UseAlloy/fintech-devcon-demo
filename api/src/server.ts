@@ -2,10 +2,14 @@ import { baseConfig, loadConfig } from './config';
 import { App } from './app';
 import { Logger, LogLevel } from './lib/logger';
 import { createMongoConnection } from './lib/mongo';
+import { fetchEncryptionKeys } from './lib/encryption-keys';
+import { encryptionKeyFindByTitleAndKeyId, encryptionKeyStore } from './repositories/wrapped-encryption-keys';
+
 import pkg from '../package.json';
 
 export const runner = async (
   skipAwsSecrets: boolean = false,
+  skipAwsKms: boolean = false,
   logLevel: LogLevel = 'info'
 ) => {
   const logger = new Logger({
@@ -24,7 +28,15 @@ export const runner = async (
     await createMongoConnection(config);
     logger.info('Connected to database');
 
-    const hapiApp = new App(logger);
+    // setup encryption keys
+    const encryptionKeys = await fetchEncryptionKeys(
+      encryptionKeyFindByTitleAndKeyId,
+      encryptionKeyStore,
+      config.API_KMS_KEY_ID,
+      skipAwsKms
+    );
+
+    const hapiApp = new App(logger, encryptionKeys);
 
     await hapiApp.startServer();
   } catch (err) {
