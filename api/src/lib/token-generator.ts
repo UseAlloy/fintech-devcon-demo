@@ -1,3 +1,4 @@
+// https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 const generateToken = (length: number) => {
   let text = '';
   const CHARACTER_LIST = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

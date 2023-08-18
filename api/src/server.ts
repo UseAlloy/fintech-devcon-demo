@@ -4,7 +4,10 @@ import { Logger, LogLevel } from './lib/logger';
 import { createMongoConnection } from './lib/mongo';
 import pkg from '../package.json';
 
-export const runner = async (logLevel: LogLevel = 'info') => {
+export const runner = async (
+  skipAwsSecrets: boolean = false,
+  logLevel: LogLevel = 'info'
+) => {
   const logger = new Logger({
     name: `${pkg.name}-${baseConfig.SERVER_UID}`,
     stream: process.stdout,
@@ -15,7 +18,7 @@ export const runner = async (logLevel: LogLevel = 'info') => {
 
   try {
     // setup configuration
-    const config = await loadConfig(logger);
+    const config = await loadConfig(logger, skipAwsSecrets);
 
     // setup mongo
     await createMongoConnection(config);

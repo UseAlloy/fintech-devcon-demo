@@ -1,16 +1,9 @@
-import crypto from 'crypto';
-
-import { Request as hapiRequest } from '@hapi/hapi';
 
 import { findUser, findUsers, saveNewUser } from '../repositories/users';
+import { Request } from '../types/router';
 import { NewUserPayload, UserSearchFilters } from '../types/users';
-import { Logger } from '../lib/logger';
 import { generateUserToken } from '../lib/token-generator';
 import { formatDate } from '../lib/helpers';
-
-type Request = hapiRequest & {
-  logger: Logger
-}
 
 type CreateUserPayload = {
   date_of_birth: string;

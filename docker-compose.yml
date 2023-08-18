@@ -13,6 +13,23 @@ services:
       - fintech-devcon-demo
     volumes:
       - ./.repo/data/mongo:/data/db
+  localstack:
+    image: localstack/localstack:0.14
+    container_name: localstack
+    hostname: localstack
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - SERVICES=kms,secretsmanager
+      - API_ENVIRONMENT=local
+    ports:
+      - 4566:4566
+    networks:
+      - fintech-devcon-demo
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./.repo/scripts/init-aws-resources.sh:/docker-entrypoint-initaws.d/init-aws-resources.sh"
+
   api:
     image: harlanj/fintech-devcon-demo-api
     container_name: fintech-devcon-demo-api
@@ -40,6 +57,7 @@ services:
       - fintech-devcon-demo
     depends_on:
       - mongo
+      - localstack
   frontend:
     image: harlanj/fintech-devcon-demo-frontend
     container_name: fintech-devcon-demo-frontend
