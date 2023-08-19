@@ -1,6 +1,7 @@
 type EncryptionKeyTitle =
   | 'piiEncryptionKey'
-  | 'piiHashSalt';
+  | 'piiHashSalt'
+  | 'appLogs';
 
 export type EncryptionKeys = {
   [title in EncryptionKeyTitle]: Buffer

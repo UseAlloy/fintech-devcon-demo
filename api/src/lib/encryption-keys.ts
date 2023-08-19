@@ -59,17 +59,20 @@ export const fetchEncryptionKeys = async (
     return {
       piiEncryptionKey: Buffer.from('pii_encryption_key______________'),
       piiHashSalt: Buffer.from('pii_hash_salt___________________'),
+      appLogs: Buffer.from('app_logs________________________'),
     };
   }
 
   const service = new EncryptionKeysService(fetchWrappedKey, storeWrappedKey);
-  const [piiEncryptionKey, piiHashSalt] = await Promise.all([
+  const [piiEncryptionKey, piiHashSalt, appLogs] = await Promise.all([
     service.getOrCreateUnwrappedKey('pii_encryption_key', kmsMasterKey),
     service.getOrCreateUnwrappedKey('pii_hash_key', kmsMasterKey),
+    service.getOrCreateUnwrappedKey('app_logs_key', kmsMasterKey),
   ]);
 
   return {
     piiEncryptionKey,
-    piiHashSalt
+    piiHashSalt,
+    appLogs
   };
 }
