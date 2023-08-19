@@ -1,30 +1,28 @@
 import { Users } from '../collections/users';
-import { formatDate } from '../lib/helpers';
-import { NewUserPayload, UserRecordCleaned, UserSearchFilters } from '../types/users';
+import { User, EncryptedUser, UserSearchFilters } from '../types/users';
 
-const CLEANED_COLUMNS = [
-  '-_id',
-  'date_of_birth',
-  'email_address',
-  'name_first',
-  'name_last',
-  'phone_number',
-  'social_security_number',
+const PII_READ_COLUMNS = [
+  'date_of_birth_encrypted',
+  'email_address_encrypted',
+  'name_first_encrypted',
+  'name_last_encrypted',
+  'phone_number_encrypted',
+  'social_security_number_encrypted',
   'user_token',
   'created_at'
-].join(' ');
+];
 
 const toObject = (record: any) => {
   return {
-    date_of_birth: formatDate(record.date_of_birth),
-    email_address: record.email_address,
-    name_first: record.name_first,
-    name_last: record.name_last,
-    phone_number: record.phone_number,
-    social_security_number: record.social_security_number,
+    date_of_birth_encrypted: record.date_of_birth_encrypted,
+    email_address_encrypted: record.email_address_encrypted,
+    name_first_encrypted: record.name_first_encrypted,
+    name_last_encrypted: record.name_last_encrypted,
+    phone_number_encrypted: record.phone_number_encrypted,
+    social_security_number_encrypted: record.social_security_number_encrypted,
     user_token: record.user_token,
     created_at: record.created_at
-  } as UserRecordCleaned;
+  } as EncryptedUser;
 };
 
 const formatSearchOptions = (filters: UserSearchFilters) => Object.keys(filters)
@@ -43,7 +41,7 @@ export const findUsers = async (filters: UserSearchFilters = {}) => {
 
   const users = await Users
     .find(options)
-    .select(CLEANED_COLUMNS);
+    .select(PII_READ_COLUMNS);
 
   return users.map(toObject);
 };
@@ -51,23 +49,13 @@ export const findUsers = async (filters: UserSearchFilters = {}) => {
 export const findUser = async (userToken: string) => {
   const user = await Users
     .findOne({ user_token: userToken })
-    .select(CLEANED_COLUMNS);
+    .select(PII_READ_COLUMNS);
 
   return toObject(user);
 };
 
-export const saveNewUser = async (payload: NewUserPayload) => {
-  const entity = new Users({
-    date_of_birth: payload.date_of_birth,
-    email_address: payload.email_address,
-    name_first: payload.name_first,
-    name_last: payload.name_last,
-    phone_number: payload.phone_number,
-    social_security_number: payload.social_security_number,
-    user_token: payload.user_token,
-    created_at: payload.created_at
-  });
-
+export const saveNewUser = async (payload: User) => {
+  const entity = new Users(payload);
   const record = await entity.save();
   return toObject(record);
 };

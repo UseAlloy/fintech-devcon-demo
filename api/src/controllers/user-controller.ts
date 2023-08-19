@@ -1,7 +1,8 @@
 
 import { findUser, findUsers, saveNewUser } from '../repositories/users';
 import { Request } from '../types/router';
-import { NewUserPayload, UserSearchFilters } from '../types/users';
+import { decrypt, encrypt, hash } from '../lib/encryption';
+import { DecryptedUser, EncryptedUser, User, UserSearchFilters } from '../types/users';
 import { generateUserToken } from '../lib/token-generator';
 import { formatDate } from '../lib/helpers';
 
@@ -18,13 +19,57 @@ type SearchUsersPayload = {
   filters: UserSearchFilters
 };
 
+const formatNewUser = async (
+  payload: CreateUserPayload,
+  encryptionKey: Buffer,
+  hashKey: Buffer
+): Promise<User> => ({
+  date_of_birth: formatDate(payload.date_of_birth),
+  date_of_birth_encrypted: await encrypt(payload.date_of_birth, encryptionKey),
+  date_of_birth_hashed: hash(payload.date_of_birth, hashKey),
+  email_address: payload.email_address,
+  email_address_encrypted: await encrypt(payload.email_address, encryptionKey),
+  email_address_hashed: hash(payload.email_address, hashKey),
+  name_first: payload.name_first,
+  name_first_encrypted: await encrypt(payload.name_first, encryptionKey),
+  name_first_hashed: hash(payload.name_first, hashKey),
+  name_last: payload.name_last,
+  name_last_encrypted: await encrypt(payload.name_last, encryptionKey),
+  name_last_hashed: hash(payload.name_last, hashKey),
+  phone_number: payload.phone_number,
+  phone_number_encrypted: await encrypt(payload.phone_number, encryptionKey),
+  phone_number_hashed: hash(payload.phone_number, hashKey),
+  social_security_number: payload.social_security_number,
+  social_security_number_encrypted: await encrypt(payload.social_security_number, encryptionKey),
+  social_security_number_hashed: hash(payload.social_security_number, hashKey),
+  user_token: generateUserToken(),
+  created_at: new Date()
+});
+
+const decryptUser = (
+  user: EncryptedUser,
+  encryptionKey: Buffer
+): DecryptedUser => ({
+  date_of_birth: formatDate(decrypt(user.date_of_birth_encrypted, encryptionKey)),
+  email_address: decrypt(user.email_address_encrypted, encryptionKey),
+  name_first: decrypt(user.name_first_encrypted, encryptionKey),
+  name_last: decrypt(user.name_last_encrypted, encryptionKey),
+  phone_number: decrypt(user.phone_number_encrypted, encryptionKey),
+  social_security_number: decrypt(user.social_security_number_encrypted, encryptionKey),
+  user_token: user.user_token,
+  created_at: user.created_at,
+});
+
 export const getUsers = async (request: Request, reply) => {
-  const { logger } = request;
+  const { encryptionKeys, logger } = request;
 
   try {
-    const records = await findUsers();
+    const encryptedUsers = await findUsers();
+    const users = encryptedUsers.map(eu =>
+      decryptUser(eu, encryptionKeys.piiEncryptionKey)
+    );
 
-    return reply.response(records).code(200);
+    return reply.response(users).code(200);
   } catch (err) {
     logger.error({
       stack: err.stack,
@@ -41,24 +86,20 @@ export const getUsers = async (request: Request, reply) => {
 };
 
 export const createUser = async (request: Request, reply) => {
-  const logger = request.logger;
+  const { encryptionKeys, logger } = request;
   const payload = request.payload as CreateUserPayload;
 
   try {
-    const newUserPayload: NewUserPayload = {
-      date_of_birth: formatDate(payload.date_of_birth),
-      email_address: payload.email_address,
-      name_first: payload.name_first,
-      name_last: payload.name_last,
-      phone_number: payload.phone_number,
-      social_security_number: payload.social_security_number,
-      user_token: generateUserToken(),
-      created_at: new Date()
-    };
+    const newUserPayload = await formatNewUser(
+      payload,
+      encryptionKeys.piiEncryptionKey,
+      encryptionKeys.piiHashSalt
+    );
 
-    const newUser = await saveNewUser(newUserPayload);
+    const encryptedUser = await saveNewUser(newUserPayload);
+    const user = decryptUser(encryptedUser, encryptionKeys.piiEncryptionKey);
 
-    return reply.response(newUser).code(201);
+    return reply.response(user).code(201);
   } catch (err) {
     logger.error({
       stack: err.stack,
@@ -75,10 +116,11 @@ export const createUser = async (request: Request, reply) => {
 };
 
 export const getUser = async (request: Request, reply) => {
-  const { logger, params: { userToken } } = request;
+  const { encryptionKeys, logger, params: { userToken } } = request;
 
   try {
-    const record = await findUser(userToken);
+    const encryptedUser = await findUser(userToken);
+    const record = decryptUser(encryptedUser, encryptionKeys.piiEncryptionKey);
 
     return reply.response(record).code(200);
   } catch (err) {
@@ -97,11 +139,14 @@ export const getUser = async (request: Request, reply) => {
 };
 
 export const searchUsers = async (request: Request, reply) => {
-  const logger = request.logger;
+  const { encryptionKeys, logger } = request;
   const { filters } = request.payload as SearchUsersPayload;
 
   try {
-    const users = await findUsers(filters);
+    const encryptedUsers = await findUsers(filters);
+    const users = encryptedUsers.map(eu =>
+      decryptUser(eu, encryptionKeys.piiEncryptionKey)
+    );
 
     return reply.response(users).code(200);
   } catch (err) {
