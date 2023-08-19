@@ -7,7 +7,23 @@ const UsersCollection = new Schema<UserRecord>({
     type: Schema.Types.String,
     required: true
   },
+  date_of_birth_encrypted: {
+    type: Schema.Types.String,
+    required: true
+  },
+  date_of_birth_hashed: {
+    type: Schema.Types.String,
+    required: true
+  },
   email_address: {
+    type: Schema.Types.String,
+    required: true
+  },
+  email_address_encrypted: {
+    type: Schema.Types.String,
+    required: true
+  },
+  email_address_hashed: {
     type: Schema.Types.String,
     required: true
   },
@@ -15,7 +31,23 @@ const UsersCollection = new Schema<UserRecord>({
     type: Schema.Types.String,
     required: true
   },
+  name_first_encrypted: {
+    type: Schema.Types.String,
+    required: true
+  },
+  name_first_hashed: {
+    type: Schema.Types.String,
+    required: true
+  },
   name_last: {
+    type: Schema.Types.String,
+    required: true
+  },
+  name_last_encrypted: {
+    type: Schema.Types.String,
+    required: true
+  },
+  name_last_hashed: {
     type: Schema.Types.String,
     required: true
   },
@@ -23,7 +55,23 @@ const UsersCollection = new Schema<UserRecord>({
     type: Schema.Types.String,
     required: true
   },
+  phone_number_encrypted: {
+    type: Schema.Types.String,
+    required: true
+  },
+  phone_number_hashed: {
+    type: Schema.Types.String,
+    required: true
+  },
   social_security_number: {
+    type: Schema.Types.String,
+    required: true
+  },
+  social_security_number_encrypted: {
+    type: Schema.Types.String,
+    required: true
+  },
+  social_security_number_hashed: {
     type: Schema.Types.String,
     required: true
   },
