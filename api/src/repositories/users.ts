@@ -1,5 +1,5 @@
 import { Users } from '../collections/users';
-import { User, EncryptedUser, UserSearchFilters } from '../types/users';
+import { User, EncryptedUser, UserPIISearchFilters } from '../types/users';
 
 const PII_READ_COLUMNS = [
   'date_of_birth_encrypted',
@@ -25,22 +25,9 @@ const toObject = (record: any) => {
   } as EncryptedUser;
 };
 
-const formatSearchOptions = (filters: UserSearchFilters) => Object.keys(filters)
-  .reduce((acc, filter) => {
-    const entries = filters[filter];
-
-    if (entries.length > 0) {
-      acc[filter] = { $regex: `.*${entries[0]}*.`, $options: 'i' };
-    }
-
-    return acc;
-  }, {});
-
-export const findUsers = async (filters: UserSearchFilters = {}) => {
-  const options = formatSearchOptions(filters);
-
+export const findUsers = async (filters: UserPIISearchFilters = {}) => {
   const users = await Users
-    .find(options)
+    .find(filters)
     .select(PII_READ_COLUMNS);
 
   return users.map(toObject);
