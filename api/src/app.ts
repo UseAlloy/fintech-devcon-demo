@@ -3,11 +3,12 @@ import * as inert from '@hapi/inert';
 import * as hapiSwagger from 'hapi-swagger';
 import * as vision from '@hapi/vision';
 
+import { encrypt } from './lib/encryption';
 import { Logger } from './lib/logger';
+import { EncryptionKeys } from './types/encryption-keys';
 import { Request } from './types/router';
 import routes from './routes';
 import pkg from '../package.json';
-import { EncryptionKeys } from './types/encryption-keys';
 
 export class App {
   constructor(
@@ -44,33 +45,34 @@ export class App {
         url: request.path,
       });
 
-      request.logger.info({
-        request: {
-          body: request.payload,
-          headers: request.headers,
-          method: request.method,
-          url: request.path,
-        }
-      }, 'Hapi API Request');
-
       return reply.continue;
     });
 
-    server.ext('onPreHandler', (request: Request, reply) => {
-      request.payload && request.logger.info({
-        request: { body: request.payload }
-      }, 'Hapi API Request Body')
+    server.ext('onPreHandler', async (request: Request, reply) => {
+      request.logger.info({
+        request: {
+          url: request.path,
+          headers: await encrypt(JSON.stringify(request.headers), this.encryptionKeys.appLogs),
+          body: request.payload
+            ? await encrypt(JSON.stringify(request.payload), this.encryptionKeys.appLogs)
+            : request.payload
+        }
+      }, 'Hapi API Request')
+
       return reply.continue;
     })
 
-    server.ext('onPostResponse', (request: Request, reply) => {
+    server.ext('onPostResponse', async (request: Request, reply) => {
       request.logger.info({
         response: {
-          // @ts-ignore 
-          body: request.response.source,
-          // @ts-ignore 
-          headers: request.response.headers,
-          // @ts-ignore 
+          // @ts-ignore
+          headers: await encrypt(JSON.stringify(request.response.headers), this.encryptionKeys.appLogs),
+          // @ts-ignore
+          body: request.response.source
+            ? await encrypt(JSON.stringify(request.response.source), this.encryptionKeys.appLogs)
+            // @ts-ignore
+            : request.response.source,
+          // @ts-ignore
           status: request.response.statusCode,
         }
       }, 'Hapi API Response');
