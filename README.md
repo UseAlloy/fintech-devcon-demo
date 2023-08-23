@@ -1,6 +1,6 @@
 # Alloy Demo Encryption System
 
-This is a demo application to demonstrate an API that saves plaintext PII data, and its conversion to store and utilize encrypted and hashed data. While this app exposes a frontend application, feel free to use this [Postman collection](https://www.postman.com/telecoms-geologist-30657333/workspace/data-encryption-system/request/28416953-c93ebce3-7aee-47b1-be86-5aa7a4616892).
+This is a demo application to demonstrate an API that saves plaintext PII data, and its conversion to store and utilize encrypted and hashed data. While this app exposes a frontend application, feel free to use this [Postman collection](https://www.postman.com/telecoms-geologist-30657333/workspace/data-encryption-system/request/28416953-c93ebce3-7aee-47b1-be86-5aa7a4616892). The colletion is available to import as well [here](./.repo/postman-collection.json).
 
 ## Dependencies
 

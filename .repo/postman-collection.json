@@ -1,0 +1,115 @@
+{
+	"info": {
+		"_postman_id": "14ff96c1-9c8c-414d-9e66-fff1cdf16457",
+		"name": "Data Encryption System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28416953",
+		"_collection_link": "https://www.postman.com/telecoms-geologist-30657333/workspace/data-encryption-system/collection/28416953-14ff96c1-9c8c-414d-9e66-fff1cdf16457?action=share&creator=28416953&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Get Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name_first\": \"John\",\n    \"name_last\": \"Q\",\n    \"email\": \"john.q@example.com\",\n    \"password\": \"Password123\",\n    \"password_confirm\": \"Password123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/users/U-aamy6f6TiFFAW2WmG83V",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"users",
+						"U-aamy6f6TiFFAW2WmG83V"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"filters\": {\n        \"email_address\": [\"john.q1\"],\n        \"name_first\": [\"john\"]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/users/search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"users",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Decrypt App Logs",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
