@@ -58,3 +58,26 @@ export type UserSearchFilters = {
   social_security_number?: string[];
   user_token?: string[];
 }
+
+export type UserPIISearchFilters = {
+  date_of_birth_hashed?: string[];
+  email_address_hashed?: string[];
+  name_first_hashed?: string[];
+  name_last_hashed?: string[];
+  phone_number_hashed?: string[];
+  social_security_number_hashed?: string[];
+  user_token?: string[];
+}
+
+export type CreateUserPayload = {
+  date_of_birth: string;
+  email_address: string;
+  name_first: string;
+  name_last: string;
+  phone_number: string;
+  social_security_number: string;
+};
+
+export type SearchUsersPayload = {
+  filters: UserSearchFilters
+};

@@ -2,22 +2,17 @@
 import { findUser, findUsers, saveNewUser } from '../repositories/users';
 import { Request } from '../types/router';
 import { decrypt, encrypt, hash } from '../lib/encryption';
-import { DecryptedUser, EncryptedUser, User, UserSearchFilters } from '../types/users';
+import {
+  CreateUserPayload,
+  DecryptedUser,
+  EncryptedUser,
+  SearchUsersPayload,
+  User,
+  UserPIISearchFilters,
+  UserSearchFilters
+} from '../types/users';
 import { generateUserToken } from '../lib/token-generator';
 import { formatDate } from '../lib/helpers';
-
-type CreateUserPayload = {
-  date_of_birth: string;
-  email_address: string;
-  name_first: string;
-  name_last: string;
-  phone_number: string;
-  social_security_number: string;
-};
-
-type SearchUsersPayload = {
-  filters: UserSearchFilters
-};
 
 const formatNewUser = async (
   payload: CreateUserPayload,
@@ -59,6 +54,19 @@ const decryptUser = (
   user_token: user.user_token,
   created_at: user.created_at,
 });
+
+const hashSearchFilters = (
+  filters: UserSearchFilters,
+  hashKey: Buffer
+): UserPIISearchFilters => Object.keys(filters).reduce((acc, filter) => {
+  if (filter === 'user_token') {
+    acc[filter] = filters[filter];
+  } else {
+    acc[`${filter}_hashed`] = filters[filter].map(val => hash(val, hashKey));
+  }
+
+  return acc;
+}, {});
 
 export const getUsers = async (request: Request, reply) => {
   const { encryptionKeys, logger } = request;
@@ -143,7 +151,8 @@ export const searchUsers = async (request: Request, reply) => {
   const { filters } = request.payload as SearchUsersPayload;
 
   try {
-    const encryptedUsers = await findUsers(filters);
+    const hashedFilters = hashSearchFilters(filters, encryptionKeys.piiHashSalt);
+    const encryptedUsers = await findUsers(hashedFilters);
     const users = encryptedUsers.map(eu =>
       decryptUser(eu, encryptionKeys.piiEncryptionKey)
     );
