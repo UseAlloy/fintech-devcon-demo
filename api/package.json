@@ -7,7 +7,7 @@
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "bootstrap-users-collection": "node -r ts-node/register ./scripts/bootstrap-users-collection.ts"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +27,7 @@
     "uuid": "9.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "8.0.2",
     "@types/bunyan": "1.8.8",
     "@types/require-dir": "1.0.2",
     "@types/uuid": "9.0.0",
