@@ -14,7 +14,7 @@ import {
 import { generateUserToken } from '../lib/token-generator';
 import { formatDate } from '../lib/helpers';
 
-const formatNewUser = async (
+export const formatNewUser = async (
   payload: CreateUserPayload,
   encryptionKey: Buffer,
   hashKey: Buffer

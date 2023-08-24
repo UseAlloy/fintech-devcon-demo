@@ -3,11 +3,13 @@ import { faker } from '@faker-js/faker';
 import { Logger, LogLevel } from '../src/lib/logger';
 import { createMongoConnection } from '../src/lib/mongo';
 import { baseConfig, loadConfig } from '../src/config';
-import pkg from '../package.json';
-import { NewUserPayload } from '../src/types/users';
+import { CreateUserPayload } from '../src/types/users';
 import { formatDate } from '../src/lib/helpers';
-import { generateUserToken } from '../src/lib/token-generator';
 import { saveNewUser } from '../src/repositories/users';
+import { formatNewUser } from '../src/controllers/user-controller';
+import { fetchEncryptionKeys } from '../src/lib/encryption-keys';
+import { encryptionKeyFindByTitleAndKeyId, encryptionKeyStore } from '../src/repositories/wrapped-encryption-keys';
+import pkg from '../package.json';
 
 const generatePhoneNumber = () => {
   const number = faker.phone.number();
@@ -28,23 +30,27 @@ const generateSSN = () => {
   return text;
 };
 
-const createUser = async () => {
-  const payload: NewUserPayload = {
+const createEncryptedUser = async (
+  encryptionKey: Buffer,
+  hashKey: Buffer
+) => {
+  const payload: CreateUserPayload = {
     date_of_birth: formatDate(faker.date.birthdate().toISOString()),
     email_address: faker.internet.email(),
     name_first: faker.person.firstName(),
     name_last: faker.person.lastName(),
     phone_number: generatePhoneNumber(),
-    social_security_number: generateSSN(),
-    user_token: generateUserToken(),
-    created_at: new Date()
+    social_security_number: generateSSN()
   };
 
-  await saveNewUser(payload);
+  const encryptedPayload = await formatNewUser(payload, encryptionKey, hashKey);
+
+  await saveNewUser(encryptedPayload);
 }
 
-export const generatePlaintextUserCollectionData = async (
+export const generateEncryptedUserCollectionData = async (
   skipAwsSecrets = false,
+  skipAwsKms = false,
   logLevel: LogLevel = 'info',
   numOfRecordsToCreate: number = 10
 ) => {
@@ -59,12 +65,25 @@ export const generatePlaintextUserCollectionData = async (
   // setup mongo
   await createMongoConnection(config);
 
-  for (var i = 0; i < numOfRecordsToCreate; i++) {
-    await createUser();
-  }
-};
+  // setup encryption keys
+  const encryptionKeys = await fetchEncryptionKeys(
+    encryptionKeyFindByTitleAndKeyId,
+    encryptionKeyStore,
+    config.API_KMS_KEY_ID,
+    skipAwsKms
+  );
 
-generatePlaintextUserCollectionData()
+  encryptionKeys.piiEncryptionKey
+
+  for (var i = 0; i < numOfRecordsToCreate; i++) {
+    await createEncryptedUser(
+      encryptionKeys.piiEncryptionKey,
+      encryptionKeys.piiHashSalt
+    );
+  }
+}
+
+generateEncryptedUserCollectionData()
   .then(() => {
     console.log('Done!')
     process.exit(0);
