@@ -72,6 +72,7 @@ services:
       - 3000:3000
     volumes:
       - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
     networks:
       - fintech-devcon-demo
     depends_on:
